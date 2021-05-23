@@ -28,7 +28,7 @@ import openfl.Assets;
 import Discord.DiscordClient;
 #end
 
-#if cpp
+#if desktop
 import sys.thread.Thread;
 #end
 
@@ -295,8 +295,7 @@ class TitleState extends MusicBeatState
 				NGio.unlockMedal(61034);
 			#end
 
-			if (FlxG.save.data.flashing)
-				titleText.animation.play('press');
+			titleText.animation.play('press');
 
 			FlxG.camera.flash(FlxColor.WHITE, 1);
 			FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
@@ -306,21 +305,17 @@ class TitleState extends MusicBeatState
 
 			new FlxTimer().start(2, function(tmr:FlxTimer)
 			{
+
 				// Get current version of Kade Engine
 
-				//var http = new haxe.Http("https://raw.githubusercontent.com/KadeDev/Kade-Engine/master/version.downloadMe");
-				var http = new haxe.Http("https://raw.githubusercontent.com/KadeDev/Kade-Engine/patchnotes/version.downloadMe");
-				var returnedData:Array<String> = [];
-				
-				http.onData = function (data:String)
-				{
-					returnedData[0] = data.substring(0, data.indexOf(';'));
-					returnedData[1] = data.substring(data.indexOf('-'), data.length);
-				  	if (!MainMenuState.kadeEngineVer.contains(returnedData[0].trim()) && !OutdatedSubState.leftState && MainMenuState.nightly == "")
+				var http = new haxe.Http("https://raw.githubusercontent.com/KadeDev/Kade-Engine/master/version.downloadMe");
+
+				http.onData = function (data:String) {
+				  
+				  	if (!MainMenuState.kadeEngineVer.contains(data.trim()) && !OutdatedSubState.leftState && MainMenuState.nightly == "")
 					{
-						trace('outdated lmao! ' + returnedData[0] + ' != ' + MainMenuState.kadeEngineVer);
-						OutdatedSubState.needVer = returnedData[0];
-						OutdatedSubState.currChanges = returnedData[1];
+						trace('outdated lmao! ' + data.trim() + ' != ' + MainMenuState.kadeEngineVer);
+						OutdatedSubState.needVer = data;
 						FlxG.switchState(new OutdatedSubState());
 					}
 					else
@@ -335,11 +330,12 @@ class TitleState extends MusicBeatState
 				}
 				
 				http.request();
+
 			});
 			// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
 		}
 
-		if (pressedEnter && !skippedIntro && initialized)
+		if (pressedEnter && !skippedIntro)
 		{
 			skipIntro();
 		}
